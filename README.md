@@ -8,8 +8,8 @@
 - **Variable Declaration and Assignment**: Allows the declaration and assignment of variables using the let keyword. Variables can hold integer values.
 - **Variable Scoping**: Follows lexical scoping rules. Variables declared in inner scopes can shadow outer variables with the same name.
 - **Error Handling**: Provides informative error messages for various scenarios including division by zero, undefined identifiers, redefinition of variables, and type mismatches.
-- **Control Flow**: Use if-else statements, while loops and ternary expressions (`(condition) ? true_expr : false_expr`)
-- **Pointer Representation**: Displays the memory address and value of variables using pointer notation (&variable).
+- **Control Flow**: Use `if-els`e statements, `while` loops and ternary expressions (`(condition) ? true_expr : false_expr`)
+- **Pointer Representation**: Displays the memory address and value of variables using pointer notation (`&variable`).
 
 ## Installation ##
 To install µRust, clone the repository and run the following command:
