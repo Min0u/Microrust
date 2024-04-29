@@ -74,9 +74,6 @@ pub fn parse_boxkind(mut pairs: Pairs<Rule>) -> PtrKind {
 
 pub fn parse_boxkind_rule(first_rule: Pair<'_, Rule>) -> PtrKind {
     match first_rule.as_rule() {
-        Rule::BOX => PtrKind::Box,
-        Rule::RC => PtrKind::Rc,
-        Rule::RAWPTR => PtrKind::RawPtr,
         _ => unreachable!()
     }
 }
@@ -92,12 +89,6 @@ pub fn parse_expr(pairs: Pairs<Rule>) -> Expression {
             })),
             Rule::lexpr => Expression::ValueAt(parse_lexpr(primary.into_inner())),
             Rule::expr => parse_expr(primary.into_inner()),
-            Rule::boxexpr => {
-                let mut rules = primary.into_inner();
-                let boxkind = parse_boxkind(rules.next().unwrap().into_inner());
-                let expr = parse_expr(rules.next().unwrap().into_inner());
-                Expression::NewPtr(boxkind, Box::new(expr))
-            },
             Rule::atom => parse_expr(primary.into_inner()),
             Rule::conditional_expr => {
                 let mut rules = primary.into_inner();
@@ -107,6 +98,16 @@ pub fn parse_expr(pairs: Pairs<Rule>) -> Expression {
                 Expression::Conditional{cond, cond_true, cond_false}
             },
             Rule::unit => Expression::Const(ParsedValue::Unit),
+            Rule::identifier => Expression::Identifier(Identifier::from(primary.as_str())),
+            Rule::ptrnew => Expression::NewPtr,
+            Rule::deref => {
+                let expr = Box::new(parse_expr(primary.into_inner()));
+                Expression::Deref(expr)
+            },
+            Rule::ampersand => {
+                let expr = Box::new(parse_expr(primary.into_inner()));
+                Expression::AmpersAnd(expr)
+            },
             rule => unreachable!("parse_expr expected atom, found {:?}", rule),
         })
         .map_infix(|lhs, op, rhs| {
@@ -178,10 +179,6 @@ pub fn parse_instr(pairs: &mut Pairs<Rule>) -> Result<Instruction, ParseError> {
         Rule::free_instr => {
             let lexpr = parse_lexpr(first_rule.into_inner());
             Ok(Instruction::Free(lexpr))
-        },
-        Rule::drop_instr => {
-            let lexpr = parse_lexpr(first_rule.into_inner());
-            Ok(Instruction::Drop(lexpr))
         },
         _ => unreachable!("parse_instr expected instr, found {:?}", first_rule),
     }

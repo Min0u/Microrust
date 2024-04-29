@@ -1,19 +1,19 @@
 use std::fmt::{self, Display};
 
-//use crate::memory::Address; // enlever ce commentaire une fois Address défini
 use crate::parsing::expression::Expression;
 use crate::identifier::Identifier;
+use crate::memory::Address;
 
 use crate::parser::ParseError;
 use crate::r#type::Type;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Error {
     ParseError(ParseError),
     EvalError(EvalError),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum EvalError {
     DivisionByZero(Expression),

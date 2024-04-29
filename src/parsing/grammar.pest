@@ -13,19 +13,13 @@ ELSE = _{ "else" }
 WHILE = _{ "while" }
 TRUE = _{ "true" }
 FALSE = _{ "false" }
-BOX = { "Box" }
-RAWPTR = { "RawPtr" }
-RC = { "Rc" }
+PTR = { "Ptr" }
 NEW = _{ "new" }
 FREE = _{ "free" }
-DROPKW = _{ "drop" }
-keyword = { LET | MUT | IF | ELSE | WHILE | TRUE | FALSE | BOX | NEW | FREE | DROPKW }
+keyword = { LET | MUT | IF | ELSE | WHILE | TRUE | FALSE | PTR | NEW | FREE }
 
 // BOOLEAN
 boolean = { TRUE | FALSE }
-
-// BOXKIND
-boxkind = { BOX | RAWPTR | RC }
 
 // IDENTIFIERS
 identifier = @{ !keyword ~ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
@@ -57,26 +51,29 @@ COLON = _{ ":" }
 QUESTIONMARK = _{ "?" }
 
 // EXPRESSIONS
-atom = _{ 
+atom = _{
   integer
 | boolean
 | unit
-| boxexpr
+| ptrnew
 | conditional_expr
-| lexpr 
-| TRUE 
-| FALSE 
-| LPAR ~ expr ~ RPAR 
+| identifier
+| deref
+| ampersand
+| lexpr
+| TRUE
+| FALSE
+| LPAR ~ expr ~ RPAR
 }
 unit = { "()" }
-boxexpr = { boxkind ~ "::" ~ NEW ~ LPAR ~ expr ~ RPAR}
+ptrnew = {  PTR ~ "::" ~ NEW ~ LPAR ~ RPAR}
 conditional_expr = { LPAR ~ expr ~ RPAR ~ QUESTIONMARK ~ expr ~ COLON ~ expr }
 expr = { atom ~ (bin_op ~ atom)* }
 
 // LEFT EXPRESSIONS
 lexpr = { deref | identifier }
-deref = { "*" ~ lexpr }
-
+deref = { "*" ~ atom }
+ampersand = { "&" ~ atom }
 
 // INSTRUCTIONS
 let_equals = { LET ~ identifier ~ EQUALS ~ expr }
@@ -88,21 +85,18 @@ instrs = { empty_block | non_empty_block }
 empty_block = { LCURL ~ RCURL }
 non_empty_block = { LCURL ~ instr ~ (SEMICOLON ~ instr)* ~ RCURL }
 free_instr = { FREE ~ LPAR ~ lexpr ~ RPAR }
-drop_instr = { DROPKW ~ LPAR ~ lexpr ~ RPAR }
-instr = { 
-  update_instr 
-| expr 
-| let_equals 
-| let_mut_equals 
-| instrs 
-| if_instr 
+instr = {
+  update_instr
+| expr
+| let_equals
+| let_mut_equals
+| instrs
+| if_instr
 | while_instr
 | free_instr
-| drop_instr
 }
 
 start_rule_instr = _{ SOI ~ instr ~ EOI }
 start_rule_expr = _{ SOI ~ expr ~ EOI }
 start_rule_lexpr = _{ SOI ~ lexpr ~ EOI }
 start_rule_binop = _{ SOI ~ bin_op ~ EOI }
-

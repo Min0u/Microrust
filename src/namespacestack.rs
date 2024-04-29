@@ -1,5 +1,6 @@
 use crate::error::EvalError;
 use crate::identifier::Identifier;
+use crate::memory::Address;
 use crate::namespace::NameSpace;
 use crate::parsing::value::Value;
 
@@ -44,5 +45,15 @@ impl NameSpaceStack {
             }
         }
         Err(EvalError::Undefined(id.clone()))
+    }
+
+    pub fn get_address(&self, id: &Identifier) -> Result<Address, EvalError> {
+        for index in  (0..self.stack.len()).rev() {
+            if self.stack[index].find(id).is_ok() {
+                return Ok(Address::StackAddress(index, id.clone()));
+            }
+        }
+        Err(EvalError::Undefined(id.clone()))
+
     }
 }

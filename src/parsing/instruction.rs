@@ -15,7 +15,6 @@ pub enum Instruction {
     WriteAt(LeftExpression, Expression),
     While(Expression, Box<Instruction>),
     Free(LeftExpression),
-    Drop(LeftExpression)
 }
 
 use std::fmt::Display;
@@ -46,9 +45,6 @@ impl Display for Instruction {
             Free(lexpr) => {
                 write!(f, "free {}", lexpr)
             },
-            Drop(lexpr) => {
-                write!(f, "drop {}", lexpr)
-            }
         }
     }
 }

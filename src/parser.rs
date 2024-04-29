@@ -1,6 +1,6 @@
 use std::fmt::{self, Display};
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum ParseError {
     CannotParse,

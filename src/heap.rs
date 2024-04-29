@@ -1,6 +1,6 @@
 use crate::memory::Address;
 use crate::memorycell::MemoryCell;
-use crate::value::Value;
+use crate::parsing::value::Value;
 
 #[derive(Clone, Debug)]
 pub struct Heap(Vec<MemoryCell>);

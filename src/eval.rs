@@ -1,8 +1,8 @@
-use std::ops::Deref;
 use crate::Identifier;
 use crate::parsing::binop::Binop::*;
 use crate::error::EvalError;
-use crate::error::EvalError::{DivisionByZero, Undefined};
+use crate::error::EvalError::{DivisionByZero};
+use crate::memory::Address;
 use crate::parsing::expression::Expression;
 use crate::parsing::expression::Expression::*;
 use crate::parsing::instruction::Instruction;
@@ -87,12 +87,12 @@ impl Expression {
                         match (v1, v2) {
                             (Value::Integer(i1), Value::Integer(i2)) => Ok(Value::Boolean(i1 == i2)),
                             (Value::Boolean(b1), Value::Boolean(b2)) => Ok(Value::Boolean(b1 == b2)),
-                            (Value::Boolean(b), Value::Integer(i)) => Err(EvalError::TypeMismatch{
+                            (Value::Boolean(_b), Value::Integer(_i)) => Err(EvalError::TypeMismatch{
                                 expression: *e2.clone(),
                                 expected: Type::Bool,
                                 found: Some(Type::Int)
                             }),
-                            (Value::Integer(i), Value::Boolean(b)) => Err(EvalError::TypeMismatch{
+                            (Value::Integer(_i), Value::Boolean(_b)) => Err(EvalError::TypeMismatch{
                                 expression: *e1.clone(),
                                 expected: Type::Int,
                                 found: Some(Type::Bool)
@@ -106,12 +106,12 @@ impl Expression {
                         match (v1, v2) {
                             (Value::Integer(i1), Value::Integer(i2)) => Ok(Value::Boolean(i1 != i2)),
                             (Value::Boolean(b1), Value::Boolean(b2)) => Ok(Value::Boolean(b1 != b2)),
-                            (Value::Boolean(b), Value::Integer(i)) => Err(EvalError::TypeMismatch{
+                            (Value::Boolean(_b), Value::Integer(_i)) => Err(EvalError::TypeMismatch{
                                 expression: *e2.clone(),
                                 expected: Type::Bool,
                                 found: Some(Type::Int)
                             }),
-                            (Value::Integer(i), Value::Boolean(b)) => Err(EvalError::TypeMismatch{
+                            (Value::Integer(_i), Value::Boolean(_b)) => Err(EvalError::TypeMismatch{
                                 expression: *e1.clone(),
                                 expected: Type::Int,
                                 found: Some(Type::Bool)
@@ -162,7 +162,7 @@ impl Expression {
             ValueAt (lexpr) => {
                 eval_lexpr(lexpr, nss)
             }
-            NewPtr(boxkind, expr) => {
+            NewPtr => {
                 todo!()
             }
             Deref(_) => todo!(),
@@ -170,6 +170,14 @@ impl Expression {
                 let addr = self.eval_to_address(nss)?;
                 Ok(Value::Pointer(addr))
             }
+        }
+    }
+
+    fn eval_to_address(&self, nss: &mut NameSpaceStack) -> Result<Address, EvalError> {
+        match self {
+            AmpersAnd(e) => e.eval_to_address(nss),
+            Identifier(id) => nss.get_address(id.into()),
+            _ => todo!(),
         }
     }
 }
@@ -228,14 +236,12 @@ impl Instruction {
                 }
             }
             Instruction::While(cond, instr) => {
-                let mut res = Value::Unit;
                 loop {
                     let v = cond.eval(nss)?;
                     let b = v.to_bool();
                     match b {
                         Ok(true) => {
                             let (_id, v) = instr.exec(nss).map_err(|err| {nss.pop(); err})?;
-                            res = v;
                         }
                         Ok(false) => break,
                         _ => return Err(EvalError::Undefined(Identifier::from("While")))
@@ -243,10 +249,7 @@ impl Instruction {
                 }
                 Ok((None, Unit))
             }
-            Instruction::Free(lexpr) => {
-                todo!()
-            }
-            Instruction::Drop(lexpr) => {
+            Instruction::Free(_lexpr) => {
                 todo!()
             }
         }

@@ -15,7 +15,7 @@ impl Display for Type {
             Int => write!(f, "isize"),
             Bool => write!(f, "bool"),
             Unit => write!(f, "unit"),
-            Address => write!(f, "address"),
+            Address => write!(f, "Ptr"),
         }
     }
 }

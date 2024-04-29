@@ -2,7 +2,7 @@ use std::fmt::{self, Display};
 
 use crate::identifier::Identifier;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum LeftExpression {
     Identifier(Identifier),
     Star(Box<LeftExpression>),

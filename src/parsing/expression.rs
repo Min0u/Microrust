@@ -1,13 +1,13 @@
 use super::leftexpression::LeftExpression;
 use super::binop::Binop;
-use super::ptr_kind::PtrKind;
+
 use super::parsedvalue::ParsedValue;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
     Const(ParsedValue),
     Identifier(Identifier),
-    NewPtr(PtrKind, Box<Expression>),
+    NewPtr,
     ValueAt(LeftExpression),
     BinOp(Box<Expression>, Binop, Box<Expression>),
     Conditional{
@@ -27,7 +27,7 @@ impl Display for Expression {
         use Expression::*;
         match self {
             Const(i) => write!(f, "{}", i),
-            NewPtr(boxkind, expr) => write!(f, "{}::new({})", boxkind, expr),
+            NewPtr => write!(f,  "Ptr::new()"),
             ValueAt(lexpr) => write!(f, "{}", lexpr),
             BinOp(lhs, op, rhs) => write!(f, "({} {} {})", lhs, op, rhs),
             Conditional { cond, cond_true, cond_false } =>
