@@ -1,5 +1,4 @@
 use std::fmt::{self, Display};
-
 use crate::parsing::expression::Expression;
 use crate::identifier::Identifier;
 use crate::memory::Address;
