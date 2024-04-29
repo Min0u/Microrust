@@ -11,15 +11,12 @@
 - **Control Flow**: Use `if-els`e statements, `while` loops and ternary expressions (`(condition) ? true_expr : false_expr`)
 - **Pointer Representation**: Displays the memory address and value of variables using pointer notation (`&variable`).
 
-## Installation ##
-To install µRust, clone the repository and run the following command:
+## Installation & Usage
+To run the µRust interpreter, follow these steps:
 
-```bash
-cargo install --path .
-```
-
-## Usage ##
-To run the µRust interpreter, use the following command:
+1. Clone this repository to your machine.
+2. Make sure you have Rust and Cargo installed on your system.
+3. Execute the following command at the root of the project:
 
 ```bash
 cargo run
