@@ -1,6 +1,6 @@
 # µRust #
 
-µRust is a small, simple and fast interpreter programming framework for Rust.
+µRust is a small, simple, and fast interpreter for the Rust programming language.
 
 ## Features ##
 
