@@ -1,0 +1,108 @@
+// see https://pest.rs/book/ and https://pest.rs/book/examples/calculator.html
+
+integer = @{ ASCII_DIGIT+ }
+
+// WHITE SPACES
+WHITESPACE = _{ " " }
+
+// KEYWORDS
+LET = _{ "let" }
+MUT = _{ "mut" }
+IF = _{ "if" }
+ELSE = _{ "else" }
+WHILE = _{ "while" }
+TRUE = _{ "true" }
+FALSE = _{ "false" }
+BOX = { "Box" }
+RAWPTR = { "RawPtr" }
+RC = { "Rc" }
+NEW = _{ "new" }
+FREE = _{ "free" }
+DROPKW = _{ "drop" }
+keyword = { LET | MUT | IF | ELSE | WHILE | TRUE | FALSE | BOX | NEW | FREE | DROPKW }
+
+// BOOLEAN
+boolean = { TRUE | FALSE }
+
+// BOXKIND
+boxkind = { BOX | RAWPTR | RC }
+
+// IDENTIFIERS
+identifier = @{ !keyword ~ ASCII_ALPHA ~ ASCII_ALPHANUMERIC* }
+
+// OPERATORS
+ADD = { "+" }
+SUBTRACT = { "-" }
+MULTIPLY = { "*" }
+DIVIDE = { "/" }
+MODULO = { "%" }
+EQQUALS = @{ "==" }
+NEQ = @{ "!=" }
+EQUALS = _{ "=" }
+LEQ = @{ "<=" }
+GEQ = @{ ">=" }
+LOWER = { "<" }
+GREATER = { ">" }
+AND = { "&&" }
+OR = { "||" }
+bin_op = _{ ADD | SUBTRACT | MULTIPLY | DIVIDE | MODULO | EQQUALS | NEQ | LEQ | GEQ | LOWER | GREATER | AND | OR }
+
+// DELIMITERS
+LPAR = _{ "(" }
+RPAR = _{ ")" }
+LCURL = _{ "{" }
+RCURL = _{ "}" }
+SEMICOLON = _{ ";" }
+COLON = _{ ":" }
+QUESTIONMARK = _{ "?" }
+
+// EXPRESSIONS
+atom = _{ 
+  integer
+| boolean
+| unit
+| boxexpr
+| conditional_expr
+| lexpr 
+| TRUE 
+| FALSE 
+| LPAR ~ expr ~ RPAR 
+}
+unit = { "()" }
+boxexpr = { boxkind ~ "::" ~ NEW ~ LPAR ~ expr ~ RPAR}
+conditional_expr = { LPAR ~ expr ~ RPAR ~ QUESTIONMARK ~ expr ~ COLON ~ expr }
+expr = { atom ~ (bin_op ~ atom)* }
+
+// LEFT EXPRESSIONS
+lexpr = { deref | identifier }
+deref = { "*" ~ lexpr }
+
+
+// INSTRUCTIONS
+let_equals = { LET ~ identifier ~ EQUALS ~ expr }
+let_mut_equals = { LET ~ MUT ~ identifier ~ EQUALS ~ expr}
+while_instr = { WHILE ~ expr ~ instrs}
+if_instr = {IF ~ expr ~ instrs ~ ELSE ~ instrs}
+update_instr = {lexpr ~ EQUALS ~ expr }
+instrs = { empty_block | non_empty_block }
+empty_block = { LCURL ~ RCURL }
+non_empty_block = { LCURL ~ instr ~ (SEMICOLON ~ instr)* ~ RCURL }
+free_instr = { FREE ~ LPAR ~ lexpr ~ RPAR }
+drop_instr = { DROPKW ~ LPAR ~ lexpr ~ RPAR }
+instr = { 
+  update_instr 
+| expr 
+| let_equals 
+| let_mut_equals 
+| instrs 
+| if_instr 
+| while_instr
+| free_instr
+| drop_instr
+}
+
+start_rule_instr = _{ SOI ~ instr ~ EOI }
+start_rule_expr = _{ SOI ~ expr ~ EOI }
+start_rule_lexpr = _{ SOI ~ lexpr ~ EOI }
+start_rule_binop = _{ SOI ~ bin_op ~ EOI }
+
