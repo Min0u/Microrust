@@ -3,7 +3,6 @@ mod parsing;
 mod parser;
 mod error;
 mod identifier;
-
 mod eval;
 mod namespace;
 mod namespacestack;
@@ -13,8 +12,7 @@ mod memory;
 mod memorycell;
 
 // LISTE DES IMPORTS
-use crate::r#type::Type
-;
+use crate::r#type::Type;
 use crate::parsing::value::Value;
 use crate::error::{Error};
 use crate::identifier::Identifier;
@@ -22,8 +20,6 @@ use std::io::{self, BufRead, Write};
 use crate::parsing::instruction::Instruction;
 use crate::namespacestack::NameSpaceStack;
 use crate::parser::Parse;
-
-
 
 // AFFICHAGE DU PROMPT
 fn prompt() {
