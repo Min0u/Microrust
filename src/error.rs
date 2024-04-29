@@ -3,7 +3,6 @@ use std::fmt::{self, Display};
 use crate::parsing::expression::Expression;
 use crate::identifier::Identifier;
 use crate::memory::Address;
-
 use crate::parser::ParseError;
 use crate::r#type::Type;
 
